@@ -1,6 +1,6 @@
 docker build -t php-mysql-crud .
   
-docker run -d -p 8080:80 \
+docker run -d -p 80:80 \
   -e DB_HOST=db_endpoint \
   -e DB_USER=user \
   -e DB_PASSWORD=password \
