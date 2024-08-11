@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        // Define environment variables
+        // Define environment variables for database connection
         DB_HOST = 'phpdb.cp4oyg4e6tsj.ap-south-1.rds.amazonaws.com'
         DB_USER = 'admin'
         DB_PASSWORD = 'admin123'
@@ -12,16 +12,23 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Pull the latest code from the repository
-                git 'https://github.com/kunalbagnial/PHP-MySQL-CRUD-Operations.git'
+                script {
+                    // Pull the latest code from the repository
+                    git url: 'https://github.com/kunalbagnial/PHP-MySQL-CRUD-Operations.git'
+                }
             }
         }
         
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the Docker image
-                    sh 'docker build -t php-mysql-crud .'
+                    // Check if Dockerfile exists
+                    if (fileExists('Dockerfile')) {
+                        // Build the Docker image
+                        sh 'docker build -t php-mysql-crud .'
+                    } else {
+                        error 'Dockerfile not found'
+                    }
                 }
             }
         }
@@ -35,7 +42,7 @@ pipeline {
                     docker rm php-mysql-crud || true
                     '''
                     
-                    // Run the Docker container
+                    // Run the Docker container with environment variables
                     sh '''
                     docker run -d -p 8080:80 \
                       -e DB_HOST=${DB_HOST} \
