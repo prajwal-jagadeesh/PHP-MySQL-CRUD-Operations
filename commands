@@ -8,3 +8,12 @@ docker run -d -p 8080:80 \
   --name php-mysql-crud php-mysql-crud
 
   mysql -h phpdb.cp4oyg4e6tsj.ap-south-1.rds.amazonaws.com -u admin -p phpdb < employees_dump.sql
+
+sudo apt update
+sudo apt install openjdk-11-jdk
+wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
+sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary > /etc/apt/sources.list.d/jenkins.list'
+sudo apt update
+sudo apt install jenkins
+sudo systemctl start jenkins
+sudo systemctl status jenkins
