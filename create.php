@@ -1,4 +1,23 @@
 <?php
+mysqli_report(MYSQLI_REPORT_OFF);
+
+// Database credentials from environment variables
+define("DB_SERVER", getenv('DB_HOST'));
+define("DB_USERNAME", getenv('DB_USER'));
+define("DB_PASSWORD", getenv('DB_PASSWORD'));
+define("DB_NAME", getenv('DB_NAME'));
+
+// Create connection
+$link = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+
+// Check connection
+if (!$link) {
+    die("Connection error: " . mysqli_connect_error());
+}
+?>
+
+ubuntu@ip-172-31-44-242:~/PHP-MySQL-CRUD-Operations$ cat create.php 
+<?php
 # Include connection
 require_once "./config.php";
 
@@ -8,94 +27,97 @@ $fname = $lname = $email = $age = $gender = $designation = $date = "";
 
 # Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  if (empty(trim($_POST["fname"]))) {
-    $fname_err = "This field is required.";
-  } else {
-    $fname = ucfirst(trim($_POST["fname"]));
-    if (!ctype_alpha($fname)) {
-      $fname_err = "Invalid name format.";
-    }
-  }
-
-  if (empty(trim($_POST["lname"]))) {
-    $lname_err = "This field is required.";
-  } else {
-    $lname = ucfirst(trim($_POST["lname"]));
-    if (!ctype_alpha($lname)) {
-      $lname_err = "Invalid name format.";
-    }
-  }
-
-  if (empty(trim($_POST["email"]))) {
-    $email_err = "This field is required.";
-  } else {
-    $email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-      $email_err = "Please enter a valid email address.";
-    }
-  }
-
-  if (empty(trim($_POST["age"]))) {
-    $age_err = "This field is required.";
-  } else {
-    $age = trim($_POST["age"]);
-    if (!ctype_digit($age)) {
-      $age_err = "Please enter a valid age number";
-    }
-  }
-
-  if (empty($_POST["gender"])) {
-    $gender_err = "This field is required.";
-  } else {
-    $gender = $_POST["gender"];
-  }
-
-  if (empty($_POST["designation"])) {
-    $designation_err = "This field is required.";
-  } else {
-    $designation = $_POST["designation"];
-  }
-
-  if (empty($_POST["date"])) {
-    $date_err = "This field is required";
-  } else {
-    $date = $_POST["date"];
-  }
-
-  # Check input errors before inserting data into database
-  if (empty($fname_err) && empty($lname_err) && empty($email_err) && empty($age_err) && empty($gender_err) && empty($designation_err) && empty($date_err)) {
-    # Preapre an insert statement
-    $sql = "INSERT INTO employees (first_name, last_name, email, age, gender, designation, joining_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-    if ($stmt = mysqli_prepare($link, $sql)) {
-      # Bind variables to the prepared statement as parameters
-      mysqli_stmt_bind_param($stmt, "sssisss", $param_fname, $param_lname, $param_email, $param_age, $param_gender, $param_designation, $param_date);
-
-      # Set parameters
-      $param_fname = $fname;
-      $param_lname = $lname;
-      $param_email = $email;
-      $param_age = $age;
-      $param_gender = $gender;
-      $param_designation = $designation;
-      $param_date = $date;
-
-      # Execute the statement
-      if (mysqli_stmt_execute($stmt)) {
-        echo "<script>" . "alert('New record created successfully.');" . "</script>";
-        echo "<script>" . "window.location.href='./'" . "</script>";
-        exit;
-      } else {
-        echo "Oops! Something went wrong. Please try again later.";
-      }
+    # Validate inputs
+    if (empty(trim($_POST["fname"]))) {
+        $fname_err = "This field is required.";
+    } else {
+        $fname = ucfirst(trim($_POST["fname"]));
+        if (!ctype_alpha($fname)) {
+            $fname_err = "Invalid name format.";
+        }
     }
 
-    # Close statement
-    mysqli_stmt_close($stmt);
-  }
+    if (empty(trim($_POST["lname"]))) {
+        $lname_err = "This field is required.";
+    } else {
+        $lname = ucfirst(trim($_POST["lname"]));
+        if (!ctype_alpha($lname)) {
+            $lname_err = "Invalid name format.";
+        }
+    }
 
-  # Close connection
-  mysqli_close($link);
+    if (empty(trim($_POST["email"]))) {
+        $email_err = "This field is required.";
+    } else {
+        $email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $email_err = "Please enter a valid email address.";
+        }
+    }
+
+    if (empty(trim($_POST["age"]))) {
+        $age_err = "This field is required.";
+    } else {
+        $age = trim($_POST["age"]);
+        if (!ctype_digit($age)) {
+            $age_err = "Please enter a valid age number.";
+        }
+    }
+
+    if (empty($_POST["gender"])) {
+        $gender_err = "This field is required.";
+    } else {
+        $gender = $_POST["gender"];
+    }
+
+    if (empty($_POST["designation"])) {
+        $designation_err = "This field is required.";
+    } else {
+        $designation = $_POST["designation"];
+    }
+
+    if (empty($_POST["date"])) {
+        $date_err = "This field is required.";
+    } else {
+        $date = $_POST["date"];
+    }
+
+    # Check input errors before inserting data into database
+    if (empty($fname_err) && empty($lname_err) && empty($email_err) && empty($age_err) && empty($gender_err) && empty($designation_err) && empty($date_err)) {
+        # Prepare an insert statement
+        $sql = "INSERT INTO employees (first_name, last_name, email, age, gender, designation, joining_date) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        if ($stmt = mysqli_prepare($link, $sql)) {
+            # Bind variables to the prepared statement as parameters
+            mysqli_stmt_bind_param($stmt, "sssisss", $param_fname, $param_lname, $param_email, $param_age, $param_gender, $param_designation, $param_date);
+
+            # Set parameters
+            $param_fname = $fname;
+            $param_lname = $lname;
+            $param_email = $email;
+            $param_age = $age;
+            $param_gender = $gender;
+            $param_designation = $designation;
+            $param_date = $date;
+
+            # Execute the statement
+            if (mysqli_stmt_execute($stmt)) {
+                echo "<script>alert('New record created successfully.'); window.location.href='./';</script>";
+                exit;
+            } else {
+                echo "Oops! Something went wrong. Please try again later. Error: " . mysqli_stmt_error($stmt);
+            }
+
+            # Close statement
+            mysqli_stmt_close($stmt);
+        } else {
+            # Prepare statement failed
+            echo "Prepare failed: " . mysqli_error($link);
+        }
+    }
+
+    # Close connection
+    mysqli_close($link);
 }
 ?>
 
@@ -121,23 +143,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <div class="row gy-3">
             <div class="col-lg-6">
               <label for="fname" class="form-label">First Name</label>
-              <input type="text" class="form-control" name="fname" id="fname" value="<?= $fname; ?>">
-              <small class="text-danger"><?= $fname_err; ?></small>
+              <input type="text" class="form-control" name="fname" id="fname" value="<?= htmlspecialchars($fname); ?>">
+              <small class="text-danger"><?= htmlspecialchars($fname_err); ?></small>
             </div>
             <div class="col-lg-6">
               <label for="lname" class="form-label">Last Name</label>
-              <input type="text" class="form-control" name="lname" id="lname" value="<?= $lname; ?>">
-              <small class="text-danger"><?= $lname_err; ?></small>
+              <input type="text" class="form-control" name="lname" id="lname" value="<?= htmlspecialchars($lname); ?>">
+              <small class="text-danger"><?= htmlspecialchars($lname_err); ?></small>
             </div>
             <div class="col-lg-12">
               <label for="email" class="form-label">Email Address</label>
-              <input type="email" class="form-control" name="email" id="email" value="<?= $email; ?>">
-              <small class="text-danger"><?= $email_err; ?></small>
+              <input type="email" class="form-control" name="email" id="email" value="<?= htmlspecialchars($email); ?>">
+              <small class="text-danger"><?= htmlspecialchars($email_err); ?></small>
             </div>
             <div class="col-lg-6">
               <label for="age" class="form-label">Age</label>
-              <input type="text" class="form-control" name="age" id="age" value="<?= $age; ?>">
-              <small class="text-danger"><?= $age_err; ?></small>
+              <input type="text" class="form-control" name="age" id="age" value="<?= htmlspecialchars($age); ?>">
+              <small class="text-danger"><?= htmlspecialchars($age_err); ?></small>
             </div>
             <div class="col-lg-6">
               <label for="gender" class="form-label">Gender</label>
@@ -147,7 +169,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <option value="Female" <?= (isset($gender) && $gender == "Female") ? "selected" : ""; ?>>Female</option>
                 <option value="Others" <?= (isset($gender) && $gender == "Others") ? "selected" : ""; ?>>Others</option>
               </select>
-              <small class="text-danger"><?= $gender_err; ?></small>
+              <small class="text-danger"><?= htmlspecialchars($gender_err); ?></small>
             </div>
             <div class="col-lg-6">
               <label for="designation" class="form-label">Designation</label>
@@ -166,12 +188,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                   Android Developer
                 </option>
               </select>
-              <small class="text-danger"><?= $designation_err; ?></small>
+              <small class="text-danger"><?= htmlspecialchars($designation_err); ?></small>
             </div>
             <div class="col-lg-6">
               <label for="date" class="form-label">Joining Date</label>
-              <input type="date" class="form-control" name="date" id="date" value="<?= $date; ?>">
-              <small class="text-danger"><?= $date_err; ?></small>
+              <input type="date" class="form-control" name="date" id="date" value="<?= htmlspecialchars($date); ?>">
+              <small class="text-danger"><?= htmlspecialchars($date_err); ?></small>
             </div>
             <div class="col-lg-12 d-grid">
               <button type="submit" class="btn btn-primary">Add Employee</button>
