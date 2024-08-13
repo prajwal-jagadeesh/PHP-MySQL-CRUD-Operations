@@ -1,10 +1,10 @@
 docker build -t php-mysql-crud .
   
 docker run -d -p 80:80 \
-  -e DB_HOST=db_endpoint \
-  -e DB_USER=user \
-  -e DB_PASSWORD=password \
-  -e DB_NAME=db \
+  -e DB_HOST=phpdb.cp4oyg4e6tsj.ap-south-1.rds.amazonaws.com \
+  -e DB_USER=admin \
+  -e DB_PASSWORD=admin123 \
+  -e DB_NAME=phpdb \
   --name php-mysql-crud php-mysql-crud
 
   mysql -h phpdb.cp4oyg4e6tsj.ap-south-1.rds.amazonaws.com -u admin -p phpdb < crud.sql
