@@ -7,7 +7,7 @@ docker run -d -p 80:80 \
   -e DB_NAME=db \
   --name php-mysql-crud php-mysql-crud
 
-  mysql -h phpdb.cp4oyg4e6tsj.ap-south-1.rds.amazonaws.com -u admin -p phpdb < employees_dump.sql
+  mysql -h phpdb.cp4oyg4e6tsj.ap-south-1.rds.amazonaws.com -u admin -p phpdb < crud.sql
 
 sudo apt update
 sudo apt install fontconfig openjdk-17-jre
